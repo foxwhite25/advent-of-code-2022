@@ -17,7 +17,7 @@ pub fn read_file(folder: &str, day: u8) -> String {
         .join(folder)
         .join(format!("{:02}.txt", day));
     let f = fs::read_to_string(filepath);
-    f.expect("could not open input file")
+    f.expect("could not open input file").replace("\r\n", "\n")
 }
 
 /// main! produces a block setting up the input and runner for each part.

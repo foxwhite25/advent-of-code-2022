@@ -28,7 +28,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(parse(&advent_of_code::template::read_file("examples", 1)));
-        assert_eq!(result, Some(72511));
+        assert_eq!(result, Some(24000));
     }
 
     #[test]
