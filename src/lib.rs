@@ -30,6 +30,17 @@ impl Direction {
 
         DIRECTIONS.iter()
     }
+
+    pub fn cardinal() -> Iter<'static, Direction> {
+        static DIRECTIONS: [Direction; 4] = [
+            Direction::North,
+            Direction::East,
+            Direction::South,
+            Direction::West,
+        ];
+
+        DIRECTIONS.iter()
+    }
 }
 
 /// A point in a 2D grid.
@@ -251,6 +262,32 @@ impl<T> SimpleGrid<T> {
             grid: self,
             direction,
         }
+    }
+
+    pub fn neighbours(&self, point: &Point) -> Vec<Point> {
+        let mut neighbours = vec![];
+
+        for dir in Direction::all() {
+            let neighbour = point.get_neighbour(&dir, 1);
+            if self.is_inside(&neighbour) {
+                neighbours.push(neighbour);
+            }
+        }
+
+        neighbours
+    }
+
+    pub fn cardianal_neighbours(&self, point: &Point) -> Vec<Point> {
+        let mut neighbours = vec![];
+
+        for dir in Direction::cardinal() {
+            let neighbour = point.get_neighbour(&dir, 1);
+            if self.is_inside(&neighbour) {
+                neighbours.push(neighbour);
+            }
+        }
+
+        neighbours
     }
 }
 
