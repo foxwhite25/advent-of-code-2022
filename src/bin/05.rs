@@ -31,32 +31,37 @@ fn parse(input: &str) -> Input {
             .skip(1)
             .step_by(4)
             .enumerate()
-            .for_each(|(i, x)| if x != ' ' { stack[i].push(x) })
+            .for_each(|(i, x)| {
+                if x != ' ' {
+                    stack[i].push(x)
+                }
+            })
     });
 
     let instructions = instruction_input
         .lines()
         .map(|x| {
             let k = x.split_ascii_whitespace().collect::<Vec<&str>>();
-            (k[1].parse().unwrap(), k[3].parse().unwrap(), k[5].parse().unwrap())
-        }).collect();
+            (
+                k[1].parse().unwrap(),
+                k[3].parse().unwrap(),
+                k[5].parse().unwrap(),
+            )
+        })
+        .collect();
     (stack, instructions)
 }
 
 pub fn part_one(input: Input) -> Option<String> {
     let (mut stack, instruction) = input;
     move_stacks(&mut stack, instruction, false);
-    Some(
-        top_row_string(stack)
-    )
+    Some(top_row_string(stack))
 }
 
 pub fn part_two(input: Input) -> Option<String> {
     let (mut stack, instruction) = input;
     move_stacks(&mut stack, instruction, true);
-    Some(
-        top_row_string(stack)
-    )
+    Some(top_row_string(stack))
 }
 
 advent_of_code::main!(5);

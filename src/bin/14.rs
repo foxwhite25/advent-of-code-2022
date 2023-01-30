@@ -11,24 +11,26 @@ pub enum BlockerType {
 type Input = (SparseGrid<BlockerType>, isize);
 
 fn parse(input: &str) -> Input {
-    input.lines().fold((SparseGrid::default(), 0), |mut acc, l| {
-        l.split(" -> ")
-            .filter_map(|segment| {
-                let (x, y) = segment.split_once(',').unwrap();
-                Some(Point {
-                    x: x.parse().ok()?,
-                    y: y.parse().ok()?,
+    input
+        .lines()
+        .fold((SparseGrid::default(), 0), |mut acc, l| {
+            l.split(" -> ")
+                .filter_map(|segment| {
+                    let (x, y) = segment.split_once(',').unwrap();
+                    Some(Point {
+                        x: x.parse().ok()?,
+                        y: y.parse().ok()?,
+                    })
                 })
-            })
-            .tuple_windows()
-            .for_each(|(a, b)| {
-                for point in a.line_to(&b) {
-                    acc.1 = acc.1.max(point.y);
-                    acc.0.insert(point, BlockerType::Wall);
-                }
-            });
-        acc
-    })
+                .tuple_windows()
+                .for_each(|(a, b)| {
+                    for point in a.line_to(&b) {
+                        acc.1 = acc.1.max(point.y);
+                        acc.0.insert(point, BlockerType::Wall);
+                    }
+                });
+            acc
+        })
 }
 
 fn next_pos(grid: &SparseGrid<BlockerType>, point: &Point) -> Option<Point> {
@@ -71,7 +73,7 @@ pub fn part_one(mut input: Input) -> Option<u32> {
                 count += 1;
             }
         }
-    };
+    }
     Some(count)
 }
 
@@ -97,7 +99,7 @@ pub fn part_two(mut input: Input) -> Option<u32> {
         }
 
         path.pop();
-    };
+    }
     Some(count)
 }
 

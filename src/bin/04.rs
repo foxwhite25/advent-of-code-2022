@@ -31,17 +31,12 @@ pub fn part_one(input: Input) -> Option<usize> {
         input
             .iter()
             .filter(|(v1, v2)| cover(v1, v2) || cover(v2, v1))
-            .count()
+            .count(),
     )
 }
 
 pub fn part_two(input: Input) -> Option<usize> {
-    Some(
-        input
-            .iter()
-            .filter(|(v1, v2)| overlaps(v1, v2))
-            .count()
-    )
+    Some(input.iter().filter(|(v1, v2)| overlaps(v1, v2)).count())
 }
 
 advent_of_code::main!(4);

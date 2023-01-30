@@ -1,6 +1,6 @@
 use hashbrown::HashMap;
-use std::{cmp, slice::Iter};
 use std::ops::Range;
+use std::{cmp, slice::Iter};
 
 pub mod template;
 
@@ -156,23 +156,22 @@ impl Point {
 
 pub struct MergedRanges<I> {
     values: I,
-    last: Option<Range<isize>>
+    last: Option<Range<isize>>,
 }
 
 pub fn merge_ranges<I>(iterator: I) -> MergedRanges<I::IntoIter>
-    where I: IntoIterator<Item=Range<isize>>
+where
+    I: IntoIterator<Item = Range<isize>>,
 {
     let mut values = iterator.into_iter();
     let last = values.next();
 
-    MergedRanges {
-        values,
-        last,
-    }
+    MergedRanges { values, last }
 }
 
 impl<I> Iterator for MergedRanges<I>
-    where I: Iterator<Item=Range<isize>>
+where
+    I: Iterator<Item = Range<isize>>,
 {
     type Item = Range<isize>;
 
@@ -515,20 +514,22 @@ pub mod range {
         }
 
         pub fn count(&self) -> usize {
-            self.ranges.iter().map(|r| (r.end - r.start + 1) as usize).sum()
+            self.ranges
+                .iter()
+                .map(|r| (r.end - r.start + 1) as usize)
+                .sum()
         }
     }
 
     impl FromIterator<Range> for RangeStack {
         fn from_iter<I>(iterator: I) -> Self
-            where I: IntoIterator<Item=Range>
+        where
+            I: IntoIterator<Item = Range>,
         {
             let mut raw_ranges: Vec<_> = iterator.into_iter().collect();
-            raw_ranges.sort_by(|a,b| a.start.cmp(&b.start));
+            raw_ranges.sort_by(|a, b| a.start.cmp(&b.start));
 
-            let mut range_stack = RangeStack {
-                ranges: Vec::new(),
-            };
+            let mut range_stack = RangeStack { ranges: Vec::new() };
 
             for range in &raw_ranges {
                 range_stack.add(range);
@@ -540,7 +541,8 @@ pub mod range {
 
     impl<'a> FromIterator<&'a Range> for RangeStack {
         fn from_iter<I>(iterator: I) -> Self
-            where I: IntoIterator<Item=&'a Range>
+        where
+            I: IntoIterator<Item = &'a Range>,
         {
             iterator.into_iter().cloned().collect()
         }
@@ -584,10 +586,7 @@ pub mod quadrant {
             [
                 Quadrant {
                     min: self.min.clone(),
-                    max: Point {
-                        x: mid_x,
-                        y: mid_y,
-                    },
+                    max: Point { x: mid_x, y: mid_y },
                 },
                 Quadrant {
                     min: Point {
@@ -619,5 +618,4 @@ pub mod quadrant {
             ]
         }
     }
-
 }

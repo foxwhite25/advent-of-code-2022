@@ -1,5 +1,5 @@
-use itertools::Itertools;
 use advent_of_code::{Direction, Point, SimpleGrid};
+use itertools::Itertools;
 
 type Input<'a> = SimpleGrid<u32>;
 
@@ -24,18 +24,14 @@ pub fn part_one(input: Input) -> Option<usize> {
                     true
                 } else {
                     let height = input.get(point);
-                    FOUR_DIRECTIONS
-                        .iter()
-                        .any(|dir| {
-                            input
-                                .walk(point, dir)
-                                .all(|point_b| {
-                                    input.get(&point_b) < height
-                                })
-                        })
+                    FOUR_DIRECTIONS.iter().any(|dir| {
+                        input
+                            .walk(point, dir)
+                            .all(|point_b| input.get(&point_b) < height)
+                    })
                 }
             })
-            .count()
+            .count(),
     )
 }
 

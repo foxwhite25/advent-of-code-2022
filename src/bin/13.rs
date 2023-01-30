@@ -63,9 +63,11 @@ impl Packet {
     fn right_order(packet_a: &Packet, packet_b: &Packet) -> Option<bool> {
         match (packet_a, packet_b) {
             (Packet::Number(a), Packet::Number(b)) => {
-                if a == b { return None }
+                if a == b {
+                    return None;
+                }
                 Some(a < b)
-            },
+            }
             (Packet::Array(a), Packet::Array(b)) => {
                 let mut left = a.iter();
                 let mut right = b.iter();
@@ -75,12 +77,10 @@ impl Packet {
                         (None, None) => return None,
                         (None, Some(_)) => return Some(true),
                         (Some(_), None) => return Some(false),
-                        (Some(a), Some(b)) => {
-                            match Packet::right_order(a, b) {
-                                None => continue,
-                                k => return k,
-                            }
-                        }
+                        (Some(a), Some(b)) => match Packet::right_order(a, b) {
+                            None => continue,
+                            k => return k,
+                        },
                     }
                 }
             }
@@ -152,7 +152,7 @@ pub fn part_one(input: Input) -> Option<usize> {
                     None
                 }
             })
-            .sum()
+            .sum(),
     )
 }
 
@@ -165,7 +165,8 @@ pub fn part_two(mut input: Input) -> Option<usize> {
 
     input.sort();
     Some(
-        input.iter()
+        input
+            .iter()
             .enumerate()
             .filter_map(|(i, x)| {
                 if x == &divider_a {
@@ -176,7 +177,7 @@ pub fn part_two(mut input: Input) -> Option<usize> {
                     None
                 }
             })
-            .product()
+            .product(),
     )
 }
 

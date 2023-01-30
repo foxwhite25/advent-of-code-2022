@@ -19,7 +19,7 @@ pub fn part_one(input: Input) -> Option<u32> {
                     .find(|byte| b.as_bytes().contains(byte))
                     .map(|&byte| priority_func(byte) as u32)
             })
-            .sum()
+            .sum(),
     )
 }
 
@@ -36,7 +36,8 @@ pub fn part_two(input: Input) -> Option<u32> {
                 a.iter()
                     .find(|byte| b.contains(byte) && c.contains(byte))
                     .map(|&byte| priority_func(byte) as u32)
-            }).sum()
+            })
+            .sum(),
     )
 }
 

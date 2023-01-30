@@ -1,7 +1,7 @@
-use itertools::Itertools;
-use advent_of_code::{Point};
 use advent_of_code::quadrant::Quadrant;
 use advent_of_code::range::{Range, RangeStack};
+use advent_of_code::Point;
+use itertools::Itertools;
 
 #[derive(Clone, Debug)]
 pub struct Pair {
@@ -12,10 +12,10 @@ pub struct Pair {
 
 impl Pair {
     pub fn can_contain_unseen_points(&self, quadrant: &Quadrant) -> bool {
-         quadrant.corners().iter().any(|corner| {
-             let distance = self.sensor.manhattan_distance(corner);
-             distance > self.distance
-         })
+        quadrant.corners().iter().any(|corner| {
+            let distance = self.sensor.manhattan_distance(corner);
+            distance > self.distance
+        })
     }
 }
 
@@ -54,9 +54,11 @@ fn parse(input: &str) -> Input {
             let sensor = parse_point(sensor_str)?;
             let beacon = parse_point(beacon_str)?;
             let distance = sensor.manhattan_distance(&beacon);
-            Some(
-                Pair{sensor, beacon, distance}
-            )
+            Some(Pair {
+                sensor,
+                beacon,
+                distance,
+            })
         })
         .collect()
 }
@@ -80,22 +82,33 @@ pub fn part_one(input: Input) -> Option<usize> {
         .collect::<RangeStack>();
 
     Some(
-        ranges.count() - input.iter().filter_map(|pair| {
-            if pair.beacon.y == test_value {
-                Some(pair.beacon.x)
-            } else {
-                None
-            }
-        }).unique().count()
+        ranges.count()
+            - input
+                .iter()
+                .filter_map(|pair| {
+                    if pair.beacon.y == test_value {
+                        Some(pair.beacon.x)
+                    } else {
+                        None
+                    }
+                })
+                .unique()
+                .count(),
     )
 }
 
 pub fn part_two(input: Input) -> Option<isize> {
-    let unseen_point = find_unseen_points(&input, &Quadrant {
-        min: Point { x: 0, y: 0 },
-        max: Point { x: 4000000, y: 4000000 },
-    })?;
-    Some(unseen_point.x*4000000+unseen_point.y)
+    let unseen_point = find_unseen_points(
+        &input,
+        &Quadrant {
+            min: Point { x: 0, y: 0 },
+            max: Point {
+                x: 4000000,
+                y: 4000000,
+            },
+        },
+    )?;
+    Some(unseen_point.x * 4000000 + unseen_point.y)
 }
 
 advent_of_code::main!(15);

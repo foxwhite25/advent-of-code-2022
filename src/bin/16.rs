@@ -1,6 +1,6 @@
+use itertools::Itertools;
 use std::cmp::Reverse;
 use std::collections::HashMap;
-use itertools::Itertools;
 
 type FlowRates = Vec<u8>;
 type FlowRateIndices = Vec<usize>;
@@ -68,17 +68,17 @@ impl State {
     fn bound(self, flow_rates: &FlowRates, sorted_flow_rate_indices: &[usize]) -> u16 {
         self.pressure_released
             + (0..=self.minutes_remaining)
-            .rev()
-            .step_by(2)
-            .skip(1)
-            .zip(
-                sorted_flow_rate_indices
-                    .iter()
-                    .filter(|&&i| self.can_visit(i))
-                    .map(|&i| flow_rates[i]),
-            )
-            .map(|(minutes, flow)| minutes as u16 * flow as u16)
-            .sum::<u16>()
+                .rev()
+                .step_by(2)
+                .skip(1)
+                .zip(
+                    sorted_flow_rate_indices
+                        .iter()
+                        .filter(|&&i| self.can_visit(i))
+                        .map(|&i| flow_rates[i]),
+                )
+                .map(|(minutes, flow)| minutes as u16 * flow as u16)
+                .sum::<u16>()
     }
 
     fn branch<'a>(
@@ -146,7 +146,11 @@ fn parse_row(row: &str) -> (&str, u8, Vec<&str>) {
         Some(c) => c,
         None => c.strip_prefix("valve ").unwrap(),
     };
-    (a.strip_prefix("Valve ").unwrap(), b.parse().unwrap(), c.split(", ").collect())
+    (
+        a.strip_prefix("Valve ").unwrap(),
+        b.parse().unwrap(),
+        c.split(", ").collect(),
+    )
 }
 
 fn parse(input: &str) -> Input {
@@ -187,10 +191,17 @@ fn parse(input: &str) -> Input {
         .map(|(i, _)| i)
         .collect_vec();
 
-    (flow_rates, shortest_path_lengths, sorted_flow_rate_indices, starting_node)
+    (
+        flow_rates,
+        shortest_path_lengths,
+        sorted_flow_rate_indices,
+        starting_node,
+    )
 }
 
-pub fn part_one((flow_rates, shortest_paths, sorted_flow_rate_indices, starting_idx): Input) -> Option<u16> {
+pub fn part_one(
+    (flow_rates, shortest_paths, sorted_flow_rate_indices, starting_idx): Input,
+) -> Option<u16> {
     let mut best = 0;
     branch_and_bound(
         &flow_rates,
@@ -204,7 +215,9 @@ pub fn part_one((flow_rates, shortest_paths, sorted_flow_rate_indices, starting_
     Some(best)
 }
 
-pub fn part_two((flow_rates, shortest_paths, sorted_flow_rate_indices, starting_idx): Input) -> Option<u16> {
+pub fn part_two(
+    (flow_rates, shortest_paths, sorted_flow_rate_indices, starting_idx): Input,
+) -> Option<u16> {
     let mut best_per_visited = vec![0; u16::MAX as usize];
     branch_and_bound(
         &flow_rates,

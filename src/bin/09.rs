@@ -9,13 +9,16 @@ fn parse(input: &str) -> Input {
         .lines()
         .map(|line| {
             let (dir, space) = line.split_once(" ").unwrap();
-            (match dir {
-                "U" => Direction::North,
-                "R" => Direction::East,
-                "D" => Direction::South,
-                "L" => Direction::West,
-                _ => unreachable!()
-            }, space.parse::<u32>().unwrap())
+            (
+                match dir {
+                    "U" => Direction::North,
+                    "R" => Direction::East,
+                    "D" => Direction::South,
+                    "L" => Direction::West,
+                    _ => unreachable!(),
+                },
+                space.parse::<u32>().unwrap(),
+            )
         })
         .collect::<Input>()
 }
@@ -28,7 +31,9 @@ fn knot_pos(head: &Point, knot: &Point) -> Point {
 }
 
 fn simulate_knot(steps: Input, knot_length: usize) -> usize {
-    let mut knots = (0..knot_length).map(|_| Point { x: 0, y: 0 }).collect::<Vec<Point>>();
+    let mut knots = (0..knot_length)
+        .map(|_| Point { x: 0, y: 0 })
+        .collect::<Vec<Point>>();
     let mut grid = SparseGrid::default();
 
     grid.insert(Point { x: 0, y: 0 }, ());
@@ -69,13 +74,23 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let result = part_one(parse(&advent_of_code::template::read_file("examples", 9).split_once("\n\n").unwrap().0));
+        let result = part_one(parse(
+            &advent_of_code::template::read_file("examples", 9)
+                .split_once("\n\n")
+                .unwrap()
+                .0,
+        ));
         assert_eq!(result, Some(13));
     }
 
     #[test]
     fn test_part_two() {
-        let result = part_two(parse(&advent_of_code::template::read_file("examples", 9).split_once("\n\n").unwrap().1));
+        let result = part_two(parse(
+            &advent_of_code::template::read_file("examples", 9)
+                .split_once("\n\n")
+                .unwrap()
+                .1,
+        ));
         assert_eq!(result, Some(36));
     }
 }

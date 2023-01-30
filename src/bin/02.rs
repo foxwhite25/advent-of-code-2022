@@ -1,10 +1,14 @@
 type Input = Vec<(i8, i8)>;
 
 fn parse(input: &str) -> Input {
-    input.lines()
+    input
+        .lines()
         .filter_map(|l| {
             let byte = l.as_bytes();
-            Some(((byte.first()? - 'A' as u8) as i8, (byte.last()? - 'X' as u8) as i8))
+            Some((
+                (byte.first()? - 'A' as u8) as i8,
+                (byte.last()? - 'X' as u8) as i8,
+            ))
         })
         .collect()
 }
@@ -15,25 +19,27 @@ fn result_score(their: i8, mine: i8) -> i8 {
 
 pub fn part_one(input: Input) -> Option<u32> {
     Some(
-        input.iter()
+        input
+            .iter()
             .map(|&(x, y)| (result_score(x, y) + y + 1) as u32)
-            .sum()
+            .sum(),
     )
 }
 
 pub fn part_two(input: Input) -> Option<u32> {
     Some(
-        input.iter()
+        input
+            .iter()
             .map(|&(x, y)| {
                 let mine = match y {
                     0 => (x + 2) % 3,
                     1 => x,
                     2 => (x + 1) % 3,
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 };
                 (result_score(x, mine) + mine + 1) as u32
             })
-            .sum()
+            .sum(),
     )
 }
 

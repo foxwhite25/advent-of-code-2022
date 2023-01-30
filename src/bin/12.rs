@@ -1,7 +1,7 @@
-use advent_of_code::{Point, SimpleGrid};
 use advent_of_code::shortest_path::shortest_path;
+use advent_of_code::{Point, SimpleGrid};
 
-type Input = ( SimpleGrid<char>, Point, Point);
+type Input = (SimpleGrid<char>, Point, Point);
 
 fn parse(input: &str) -> Input {
     let mut start: Option<Point> = None;
@@ -30,7 +30,13 @@ fn parse(input: &str) -> Input {
 
 pub fn part_one(input: Input) -> Option<usize> {
     let (grid, start, end) = input;
-    shortest_path(&grid, &vec![start], &end, |_| 1, |a, b| (*grid.get(b) as isize - *grid.get(a) as isize) < 2)
+    shortest_path(
+        &grid,
+        &vec![start],
+        &end,
+        |_| 1,
+        |a, b| (*grid.get(b) as isize - *grid.get(a) as isize) < 2,
+    )
 }
 
 pub fn part_two(input: Input) -> Option<usize> {
@@ -38,13 +44,21 @@ pub fn part_two(input: Input) -> Option<usize> {
     let start_points: Vec<Point> = grid
         .points()
         .into_iter()
-        .filter(|point| *grid.get(point) == 'a' &&
-            grid
-                .cardianal_neighbours(point)
-                .iter()
-                .any(|c| *grid.get(c) == 'b'))
+        .filter(|point| {
+            *grid.get(point) == 'a'
+                && grid
+                    .cardianal_neighbours(point)
+                    .iter()
+                    .any(|c| *grid.get(c) == 'b')
+        })
         .collect();
-    shortest_path(&grid, &start_points, &end, |_| 1, |a, b| (*grid.get(b) as isize - *grid.get(a) as isize) < 2)
+    shortest_path(
+        &grid,
+        &start_points,
+        &end,
+        |_| 1,
+        |a, b| (*grid.get(b) as isize - *grid.get(a) as isize) < 2,
+    )
 }
 
 advent_of_code::main!(12);

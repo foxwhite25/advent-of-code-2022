@@ -1,4 +1,4 @@
-use itertools::{sorted};
+use itertools::sorted;
 
 type Input = Vec<u32>;
 
@@ -14,9 +14,7 @@ pub fn part_one(input: Input) -> Option<u32> {
 }
 
 pub fn part_two(input: Input) -> Option<u32> {
-    Some(
-        sorted(input).rev().take(3).sum()
-    )
+    Some(sorted(input).rev().take(3).sum())
 }
 
 advent_of_code::main!(1);
