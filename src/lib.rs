@@ -1,5 +1,6 @@
 use hashbrown::HashMap;
 use std::{cmp, slice::Iter};
+use std::ops::Range;
 
 pub mod template;
 
@@ -150,6 +151,48 @@ impl Point {
                 points
             }
         }
+    }
+}
+
+pub struct MergedRanges<I> {
+    values: I,
+    last: Option<Range<isize>>
+}
+
+pub fn merge_ranges<I>(iterator: I) -> MergedRanges<I::IntoIter>
+    where I: IntoIterator<Item=Range<isize>>
+{
+    let mut values = iterator.into_iter();
+    let last = values.next();
+
+    MergedRanges {
+        values,
+        last,
+    }
+}
+
+impl<I> Iterator for MergedRanges<I>
+    where I: Iterator<Item=Range<isize>>
+{
+    type Item = Range<isize>;
+
+    fn next(&mut self) -> Option<Range<isize>> {
+        // Are we still in the loop?
+        if let Some(mut last) = self.last.clone() {
+            for new in &mut self.values {
+                if last.end < new.start {
+                    self.last = Some(new);
+                    return Some(last);
+                }
+
+                last.end = cmp::max(last.end, new.end);
+            }
+
+            self.last = None;
+            return Some(last);
+        }
+
+        None
     }
 }
 
@@ -424,4 +467,157 @@ pub mod shortest_path {
 
         None
     }
+}
+
+pub mod range {
+    use std::cmp::{max, min};
+
+    #[derive(Debug, Copy, Clone)]
+    pub struct Range {
+        start: isize,
+        end: isize,
+    }
+
+    impl Range {
+        pub fn new(start: isize, end: isize) -> Range {
+            Range {
+                start: start,
+                end: end,
+            }
+        }
+
+        pub fn overlaps(&self, other: &Range) -> bool {
+            (other.start >= self.start && other.start <= self.end)
+                || (other.end >= self.start && other.end <= self.end)
+        }
+
+        pub fn merge(&mut self, other: &Range) {
+            self.start = min(self.start, other.start);
+            self.end = max(self.end, other.end);
+        }
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct RangeStack {
+        ranges: Vec<Range>,
+    }
+
+    impl RangeStack {
+        fn add(&mut self, range: &Range) {
+            if let Some(last) = self.ranges.last_mut() {
+                if last.overlaps(range) {
+                    last.merge(range);
+                    return;
+                }
+            }
+
+            self.ranges.push(*range);
+        }
+
+        pub fn count(&self) -> usize {
+            self.ranges.iter().map(|r| (r.end - r.start + 1) as usize).sum()
+        }
+    }
+
+    impl FromIterator<Range> for RangeStack {
+        fn from_iter<I>(iterator: I) -> Self
+            where I: IntoIterator<Item=Range>
+        {
+            let mut raw_ranges: Vec<_> = iterator.into_iter().collect();
+            raw_ranges.sort_by(|a,b| a.start.cmp(&b.start));
+
+            let mut range_stack = RangeStack {
+                ranges: Vec::new(),
+            };
+
+            for range in &raw_ranges {
+                range_stack.add(range);
+            }
+
+            range_stack
+        }
+    }
+
+    impl<'a> FromIterator<&'a Range> for RangeStack {
+        fn from_iter<I>(iterator: I) -> Self
+            where I: IntoIterator<Item=&'a Range>
+        {
+            iterator.into_iter().cloned().collect()
+        }
+    }
+}
+
+pub mod quadrant {
+    use crate::Point;
+
+    #[derive(Clone, Debug)]
+    pub struct Quadrant {
+        pub min: Point,
+        pub max: Point,
+    }
+
+    impl Quadrant {
+        pub fn corners(&self) -> [Point; 4] {
+            [
+                Point {
+                    x: self.min.x,
+                    y: self.min.y,
+                },
+                Point {
+                    x: self.max.x,
+                    y: self.min.y,
+                },
+                Point {
+                    x: self.min.x,
+                    y: self.max.y,
+                },
+                Point {
+                    x: self.max.x,
+                    y: self.max.y,
+                },
+            ]
+        }
+
+        pub fn subdivide(&self) -> [Quadrant; 4] {
+            let mid_x = (self.min.x + self.max.x) / 2;
+            let mid_y = (self.min.y + self.max.y) / 2;
+            [
+                Quadrant {
+                    min: self.min.clone(),
+                    max: Point {
+                        x: mid_x,
+                        y: mid_y,
+                    },
+                },
+                Quadrant {
+                    min: Point {
+                        x: mid_x + 1,
+                        y: self.min.y,
+                    },
+                    max: Point {
+                        x: self.max.x,
+                        y: mid_y,
+                    },
+                },
+                Quadrant {
+                    min: Point {
+                        x: self.min.x,
+                        y: mid_y + 1,
+                    },
+                    max: Point {
+                        x: mid_x,
+                        y: self.max.y,
+                    },
+                },
+                Quadrant {
+                    min: Point {
+                        x: mid_x + 1,
+                        y: mid_y + 1,
+                    },
+                    max: self.max.clone(),
+                },
+            ]
+        }
+    }
+
 }
