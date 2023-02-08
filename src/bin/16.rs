@@ -28,7 +28,7 @@ fn branch_and_bound(
         .map(|state| (state.bound(flow_rates, sorted_flow_rate_indices), state))
         .filter(|&(bound, _)| filter_bound(bound, *best))
         .sorted_unstable_by_key(|(bound, _)| Reverse(*bound))
-        .for_each(|(bound, branch)| {
+        .for_each(|(_, branch)| {
             branch_and_bound(
                 flow_rates,
                 sorted_flow_rate_indices,
