@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 type MonkeyId = u32;
 
@@ -150,10 +150,13 @@ impl Monkey {
 type Input = Monkey;
 
 fn parse(input: &str) -> Input {
-    let known_values = input.lines().filter_map(|line| {
-        let (id, yell_str) = line.split_once(": ")?;
-        Some((str_id_to_monkey_id(id), yell_str.to_string()))
-    }).collect();
+    let known_values = input
+        .lines()
+        .filter_map(|line| {
+            let (id, yell_str) = line.split_once(": ")?;
+            Some((str_id_to_monkey_id(id), yell_str.to_string()))
+        })
+        .collect();
 
     Monkey::from_str(ROOT_ID, &known_values)
 }
