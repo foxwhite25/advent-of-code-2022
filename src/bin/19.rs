@@ -1,8 +1,8 @@
-use std::cmp::max;
+use crate::Material::{Clay, Geode, Obsidian, Ore};
 use itertools::Itertools;
 use rayon::prelude::*;
 use regex::Regex;
-use crate::Material::{Clay, Geode, Obsidian, Ore};
+use std::cmp::max;
 
 pub type RecipePart = (u32, Material);
 
@@ -28,10 +28,18 @@ pub struct SearchState {
 }
 
 impl SearchState {
-    fn can_build_robot(&self, robot_type: usize, blueprint: &Blueprint, max_materials: &[u32]) -> bool {
+    fn can_build_robot(
+        &self,
+        robot_type: usize,
+        blueprint: &Blueprint,
+        max_materials: &[u32],
+    ) -> bool {
         let recipe = &blueprint.robot_recipes[robot_type];
         let maxed_out = self.robots[robot_type] >= max_materials[robot_type];
-        !maxed_out && recipe.iter().all(|&(amount, material)| self.materials[material as usize] >= amount)
+        !maxed_out
+            && recipe
+                .iter()
+                .all(|&(amount, material)| self.materials[material as usize] >= amount)
     }
 
     fn build_robot(&mut self, robot_type: usize, blueprint: &Blueprint) {
@@ -51,9 +59,12 @@ impl SearchState {
 
 type Input = Vec<Blueprint>;
 
-
 fn get_blueprint_score(blueprint: &Blueprint, time_remaining: u32) -> u32 {
-    let state = SearchState { time_remaining, robots: [1,0,0,0], materials: [0,0,0,0] };
+    let state = SearchState {
+        time_remaining,
+        robots: [1, 0, 0, 0],
+        materials: [0, 0, 0, 0],
+    };
     let max_materials = get_max_materials(blueprint);
     run_for_blueprint(&state, blueprint, &max_materials, None, 0)
 }
@@ -63,7 +74,7 @@ fn run_for_blueprint(
     blueprint: &Blueprint,
     max_materials: &[u32],
     prev_skipped: Option<&Vec<usize>>,
-    best_so_far: u32
+    best_so_far: u32,
 ) -> u32 {
     if state.time_remaining == 1 {
         return state.materials[3] + state.robots[3];
@@ -87,11 +98,16 @@ fn run_for_blueprint(
         return run_for_blueprint(&new_state, blueprint, max_materials, None, best_so_far);
     }
 
-    let robots_available = (0..3).filter(|i| state.can_build_robot(*i, blueprint, max_materials)).collect_vec();
+    let robots_available = (0..3)
+        .filter(|i| state.can_build_robot(*i, blueprint, max_materials))
+        .collect_vec();
     let mut best = best_so_far;
 
     for &robot_type in &robots_available {
-        if prev_skipped.map(|ls| ls.contains(&robot_type)).unwrap_or(false) {
+        if prev_skipped
+            .map(|ls| ls.contains(&robot_type))
+            .unwrap_or(false)
+        {
             continue;
         }
 
@@ -101,7 +117,13 @@ fn run_for_blueprint(
         new_state.un_build_robot(robot_type, blueprint);
     }
 
-    let score = run_for_blueprint(&new_state, blueprint, max_materials, Some(&robots_available), best);
+    let score = run_for_blueprint(
+        &new_state,
+        blueprint,
+        max_materials,
+        Some(&robots_available),
+        best,
+    );
     best = max(score, best);
 
     best
@@ -111,7 +133,7 @@ fn optimistic_best(state: &SearchState, material: Material) -> u32 {
     let mat = material as usize;
     let i = state.time_remaining;
 
-    state.materials[mat] + state.robots[mat] * i + i * (i-1) / 2
+    state.materials[mat] + state.robots[mat] * i + i * (i - 1) / 2
 }
 
 fn get_max_materials(blueprint: &Blueprint) -> [u32; 4] {
@@ -122,10 +144,9 @@ fn get_max_materials(blueprint: &Blueprint) -> [u32; 4] {
             let i = material as usize;
             maxes[i] = max(maxes[i], amount);
         }
-    };
+    }
     maxes
 }
-
 
 fn parse(input: &str) -> Input {
     input.lines().filter_map(|line| {
@@ -157,18 +178,20 @@ fn parse(input: &str) -> Input {
 
 pub fn part_one(input: Input) -> Option<u32> {
     Some(
-        input.par_iter()
+        input
+            .par_iter()
             .map(|bp| (bp.id * get_blueprint_score(bp, 24)))
-            .sum::<u32>()
+            .sum::<u32>(),
     )
 }
 
 pub fn part_two(input: Input) -> Option<u32> {
     Some(
-        input.par_iter()
+        input
+            .par_iter()
             .take(3)
             .map(|bp| get_blueprint_score(bp, 32))
-            .product::<u32>()
+            .product::<u32>(),
     )
 }
 
